@@ -1,4 +1,4 @@
-# 🧠 AI Study Flashcard Quiz — Adaptive Learning CLI
+#  AI Study Flashcard Quiz — Adaptive Learning CLI
 
 A command-line flashcard quiz application that uses **AI-powered adaptive learning** via the **SM-2 Spaced Repetition Algorithm** to help you study smarter. Cards you struggle with appear more often; cards you know well are shown less frequently.
 
@@ -6,7 +6,7 @@ Built for the *Fundamentals of AI and ML (CSA2001)* course project.
 
 ---
 
-## 📌 Features
+##  Features
 
 - **Adaptive Quiz Engine** — SM-2 spaced repetition algorithm schedules reviews based on your confidence ratings
 - **Self-Rating System** — Rate your recall (0–5) after each card; the algorithm adjusts intervals accordingly
@@ -19,7 +19,7 @@ Built for the *Fundamentals of AI and ML (CSA2001)* course project.
 
 ---
 
-## 🖥️ Requirements
+##  Requirements
 
 - Python **3.7+** (no external libraries required — uses only the standard library)
 
@@ -50,7 +50,7 @@ This project uses only Python's built-in standard library (`json`, `os`, `random
 
 ---
 
-## ▶️ Running the Application
+##  Running the Application
 
 ```bash
 python3 main.py
@@ -63,14 +63,14 @@ python main.py
 
 ---
 
-## 🕹️ How to Use
+##  How to Use
 
 When the app launches, you'll see the main menu:
 
 ```
 ╔══════════════════════════════════════════════╗
-║   🧠  AI Study Flashcard Quiz               ║
-║       Adaptive Learning with Spaced Reps    ║
+║        AI Study Flashcard Quiz               ║
+║        Adaptive Learning with Spaced Reps    ║
 ╚══════════════════════════════════════════════╝
 
   1.  Start Quiz
@@ -107,7 +107,7 @@ When the app launches, you'll see the main menu:
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 ai-flashcard-quiz/
@@ -120,7 +120,7 @@ ai-flashcard-quiz/
 
 ---
 
-## 🤖 AI Concept: SM-2 Spaced Repetition
+##  AI Concept: SM-2 Spaced Repetition
 
 The SM-2 algorithm (SuperMemo 2) is a well-known algorithm in AI-assisted learning:
 
@@ -133,7 +133,7 @@ This mimics how human memory works — reinforcing information just before it's 
 
 ---
 
-## 📊 Data Storage
+##  Data Storage
 
 All data is stored locally in JSON format:
 - `data/flashcards.json` — Your card library
@@ -141,13 +141,13 @@ All data is stored locally in JSON format:
 
 ---
 
-## 🏫 Course
+##  Course
 
 **Fundamentals of AI and ML — CSA2001**  
 Vellore Institute of Technology
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — free to use and modify.
