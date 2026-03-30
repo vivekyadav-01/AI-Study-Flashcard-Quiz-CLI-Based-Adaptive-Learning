@@ -1,55 +1,43 @@
-#!/usr/bin/env python3
+
 """
 AI Study Flashcard Quiz - Adaptive Learning CLI
 Uses spaced repetition and confidence-based scoring to optimize learning.
 """
-
 import json
 import os
 import random
 import time
 import math
 from datetime import datetime, timedelta
-
-# ─────────────────────────────────────────────
-#  DATA FILES
-# ─────────────────────────────────────────────
+#Data Files
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 CARDS_FILE = os.path.join(DATA_DIR, "flashcards.json")
 PROGRESS_FILE = os.path.join(DATA_DIR, "progress.json")
 
 os.makedirs(DATA_DIR, exist_ok=True)
-
-
-# ─────────────────────────────────────────────
-#  SPACED REPETITION (SM-2 Algorithm)
-# ─────────────────────────────────────────────
+#Spaced Repetition
 def sm2_update(card_progress, quality: int) -> dict:
     """
     SM-2 spaced repetition algorithm.
     quality: 0-5 (0=complete blackout, 5=perfect recall)
     """
-    n = card_progress.get("n", 0)
-    ef = card_progress.get("ef", 2.5)
-    interval = card_progress.get("interval", 1)
-
-    if quality >= 3:
-        if n == 0:
-            interval = 1
-        elif n == 1:
-            interval = 6
+    n=card_progress.get("n", 0)
+    ef=card_progress.get("ef", 2.5)
+    interval=card_progress.get("interval", 1)
+    if quality>=3:
+        if n==0:
+            interval=1
+        elif n==1:
+            interval=6
         else:
-            interval = round(interval * ef)
-        n += 1
+            interval=round(interval * ef)
+        n+=1
     else:
-        n = 0
-        interval = 1
-
-    ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
-    ef = max(1.3, ef)
-
-    next_review = (datetime.now() + timedelta(days=interval)).isoformat()
-
+        n=0
+        interval=1
+    ef=ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
+    ef=max(1.3, ef)
+    next_review=(datetime.now() + timedelta(days=interval)).isoformat()
     return {
         "n": n,
         "ef": round(ef, 4),
@@ -59,46 +47,30 @@ def sm2_update(card_progress, quality: int) -> dict:
         "total_reviews": card_progress.get("total_reviews", 0) + 1,
         "correct": card_progress.get("correct", 0) + (1 if quality >= 3 else 0),
     }
-
-
 def is_due(card_progress: dict) -> bool:
     """Check if a card is due for review."""
-    next_review = card_progress.get("next_review")
+    next_review=card_progress.get("next_review")
     if not next_review:
         return True
     return datetime.now() >= datetime.fromisoformat(next_review)
-
-
-# ─────────────────────────────────────────────
 #  PERSISTENCE
-# ─────────────────────────────────────────────
 def load_cards() -> list:
     if not os.path.exists(CARDS_FILE):
         return get_default_cards()
     with open(CARDS_FILE, "r") as f:
         return json.load(f)
-
-
 def save_cards(cards: list):
     with open(CARDS_FILE, "w") as f:
         json.dump(cards, f, indent=2)
-
-
 def load_progress() -> dict:
     if not os.path.exists(PROGRESS_FILE):
         return {}
     with open(PROGRESS_FILE, "r") as f:
         return json.load(f)
-
-
 def save_progress(progress: dict):
     with open(PROGRESS_FILE, "w") as f:
         json.dump(progress, f, indent=2)
-
-
-# ─────────────────────────────────────────────
 #  DEFAULT FLASHCARDS  (AI / ML topics)
-# ─────────────────────────────────────────────
 def get_default_cards() -> list:
     return [
         {
@@ -207,45 +179,29 @@ def get_default_cards() -> list:
             "hint": "Like training a dog with treats.",
         },
     ]
-
-
-# ─────────────────────────────────────────────
 #  UI HELPERS
-# ─────────────────────────────────────────────
-CYAN = "\033[96m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-BOLD = "\033[1m"
-DIM = "\033[2m"
-RESET = "\033[0m"
-BLUE = "\033[94m"
-MAGENTA = "\033[95m"
-
-
+CYAN="\033[96m"
+GREEN="\033[92m"
+YELLOW="\033[93m"
+RED="\033[91m"
+BOLD="\033[1m"
+DIM="\033[2m"
+RESET="\033[0m"
+BLUE="\033[94m"
+MAGENTA="\033[95m"
 def clr(text, color):
     return f"{color}{text}{RESET}"
-
-
 def divider(char="─", width=60):
     print(clr(char * width, DIM))
-
-
 def header(title):
     print()
     divider("═")
     print(clr(f"  {title}", BOLD + CYAN))
     divider("═")
     print()
-
-
 def pause(msg="Press Enter to continue..."):
     input(clr(f"\n  {msg}", DIM))
-
-
-# ─────────────────────────────────────────────
 #  QUIZ ENGINE
-# ─────────────────────────────────────────────
 def pick_cards_for_session(cards, progress, count=10):
     """
     Adaptive selection:
@@ -253,67 +209,53 @@ def pick_cards_for_session(cards, progress, count=10):
     2. New cards next
     3. Fill rest randomly
     """
-    due = []
-    new_cards = []
-    others = []
-
+    due=[]
+    new_cards=[]
+    others=[]
     for card in cards:
-        cid = card["id"]
+        cid=card["id"]
         if cid not in progress:
             new_cards.append(card)
         elif is_due(progress[cid]):
             due.append(card)
         else:
             others.append(card)
-
     random.shuffle(new_cards)
     random.shuffle(others)
-
-    selected = due[:count]
-    remaining = count - len(selected)
-    selected += new_cards[:remaining]
-    remaining = count - len(selected)
-    selected += others[:remaining]
-
+    selected=due[:count]
+    remaining=count - len(selected)
+    selected+=new_cards[:remaining]
+    remaining=count - len(selected)
+    selected+=others[:remaining]
     random.shuffle(selected)
     return selected[:count]
-
-
 def run_quiz(cards, progress):
     """Run an interactive quiz session."""
-    session_cards = pick_cards_for_session(cards, progress)
-
+    session_cards=pick_cards_for_session(cards, progress)
     if not session_cards:
         print(clr("  No cards available for review!", YELLOW))
         return progress
-
-    header(f"📚 Quiz Session  —  {len(session_cards)} cards")
+    header(f" Quiz Session  —  {len(session_cards)} cards")
     print(clr("  Rate your answer: 0=No idea  1=Wrong  2=Close  3=Hard  4=Good  5=Easy\n", DIM))
-
-    session_correct = 0
-    session_total = len(session_cards)
-
+    session_correct=0
+    session_total=len(session_cards)
     for i, card in enumerate(session_cards, 1):
         cid = card["id"]
         card_prog = progress.get(cid, {})
-
         # Show question
         print(clr(f"  [{i}/{session_total}]  Topic: {card['topic']}", DIM))
         divider()
         print(f"\n  {clr('Q:', BOLD + YELLOW)}  {card['question']}\n")
-
         # Hint option
         hint_used = False
         user_input = input(clr("  Press Enter to reveal answer, or type 'hint': ", CYAN)).strip().lower()
         if user_input == "hint":
-            print(clr(f"\n  💡 Hint: {card['hint']}", YELLOW))
+            print(clr(f"\n  Hint: {card['hint']}", YELLOW))
             hint_used = True
             input(clr("  Press Enter to reveal answer...", DIM))
-
         # Show answer
         print(f"\n  {clr('A:', BOLD + GREEN)}  {card['answer']}\n")
         divider()
-
         # Self-rating
         while True:
             try:
@@ -324,80 +266,64 @@ def run_quiz(cards, progress):
                 print(clr("  Enter a number between 0 and 5.", RED))
             except ValueError:
                 print(clr("  Please enter a valid number (0-5).", RED))
-
         # Penalize slightly for hint use
         effective_rating = max(0, rating - 1) if hint_used else rating
         progress[cid] = sm2_update(card_prog, effective_rating)
-
         if rating >= 3:
             session_correct += 1
             print(clr("  ✓ Marked as known!", GREEN))
         else:
             print(clr("  ✗ Will review again soon.", RED))
-
         next_rev = progress[cid]["interval"]
         print(clr(f"  Next review in: {next_rev} day(s)\n", DIM))
-
     # Session summary
-    header("📊 Session Summary")
+    header(" Session Summary")
     pct = round((session_correct / session_total) * 100)
     bar_filled = int(pct / 5)
     bar = "█" * bar_filled + "░" * (20 - bar_filled)
     print(f"  Score:    {clr(f'{session_correct}/{session_total}', BOLD)}  ({pct}%)")
     print(f"  Progress: {clr(bar, GREEN if pct >= 70 else YELLOW if pct >= 40 else RED)}")
     print()
-
     if pct >= 80:
-        print(clr("  🔥 Excellent session! Keep it up!", GREEN + BOLD))
+        print(clr(" Excellent session! Keep it up!", GREEN + BOLD))
     elif pct >= 50:
-        print(clr("  👍 Good effort! Review weak cards again.", YELLOW))
+        print(clr("  Good effort! Review weak cards again.", YELLOW))
     else:
-        print(clr("  📖 Keep studying — you'll get there!", CYAN))
-
+        print(clr(" Keep studying — you'll get there!", CYAN))
     save_progress(progress)
     pause()
     return progress
-
-
-# ─────────────────────────────────────────────
 #  STATS VIEW
-# ─────────────────────────────────────────────
 def view_stats(cards, progress):
-    header("📈 Learning Statistics")
-
+    header(" Learning Statistics")
     if not progress:
         print(clr("  No progress data yet. Complete a quiz first!\n", YELLOW))
         pause()
         return
-
-    total = len(cards)
-    reviewed = len(progress)
-    never = total - reviewed
-    due_now = sum(1 for cid, p in progress.items() if is_due(p))
-
-    total_reviews = sum(p.get("total_reviews", 0) for p in progress.values())
-    total_correct = sum(p.get("correct", 0) for p in progress.values())
+    total=len(cards)
+    reviewed=len(progress)
+    never=total - reviewed
+    due_now=sum(1 for cid, p in progress.items() if is_due(p))
+    total_reviews=sum(p.get("total_reviews", 0) for p in progress.values())
+    total_correct=sum(p.get("correct", 0) for p in progress.values())
     accuracy = round((total_correct / total_reviews) * 100) if total_reviews > 0 else 0
-
     print(f"  {'Total cards:':<25} {clr(str(total), BOLD)}")
     print(f"  {'Cards reviewed:':<25} {clr(str(reviewed), BOLD + GREEN)}")
     print(f"  {'Never reviewed:':<25} {clr(str(never), BOLD + YELLOW)}")
     print(f"  {'Due for review now:':<25} {clr(str(due_now), BOLD + RED)}")
     print(f"  {'Total reviews done:':<25} {clr(str(total_reviews), BOLD)}")
     print(f"  {'Overall accuracy:':<25} {clr(f'{accuracy}%', BOLD + (GREEN if accuracy >= 70 else YELLOW))}")
-
     # Per-topic breakdown
     print()
     divider()
     print(clr("  Per-Topic Breakdown:", BOLD))
     divider()
-
-    topics = {}
+    topics={}
     for card in cards:
-        t = card["topic"]
-        cid = card["id"]
+        t=card["topic"]
+        cid=card["id"]
         if t not in topics:
-            topics[t] = {"total": 0, "reviewed": 0, "correct": 0, "reviews": 0}
+            topics[t]={"total": 0, "reviewed": 0, "correct": 0, "reviews": 0}
         topics[t]["total"] += 1
         if cid in progress:
             p = progress[cid]
@@ -413,11 +339,7 @@ def view_stats(cards, progress):
 
     print()
     pause()
-
-
-# ─────────────────────────────────────────────
 #  MANAGE CARDS
-# ─────────────────────────────────────────────
 def add_card(cards):
     header("➕ Add New Flashcard")
     topic = input(clr("  Topic: ", CYAN)).strip()
@@ -425,21 +347,17 @@ def add_card(cards):
         print(clr("  Topic cannot be empty.", RED))
         pause()
         return cards
-
     question = input(clr("  Question: ", CYAN)).strip()
     if not question:
         print(clr("  Question cannot be empty.", RED))
         pause()
         return cards
-
     answer = input(clr("  Answer: ", CYAN)).strip()
     if not answer:
         print(clr("  Answer cannot be empty.", RED))
         pause()
         return cards
-
     hint = input(clr("  Hint (optional): ", CYAN)).strip()
-
     new_id = str(max(int(c["id"]) for c in cards) + 1) if cards else "1"
     cards.append({
         "id": new_id,
@@ -449,13 +367,13 @@ def add_card(cards):
         "hint": hint or "No hint available.",
     })
     save_cards(cards)
-    print(clr(f"\n  ✓ Card added! (ID: {new_id})", GREEN))
+    print(clr(f"\n   Card added! (ID: {new_id})", GREEN))
     pause()
     return cards
 
 
 def list_cards(cards, progress):
-    header("📋 All Flashcards")
+    header(" All Flashcards")
     topics = sorted(set(c["topic"] for c in cards))
 
     for topic in topics:
@@ -477,48 +395,39 @@ def list_cards(cards, progress):
         print()
 
     pause()
-
-
 def delete_card(cards, progress):
-    header("🗑  Delete Flashcard")
+    header("  Delete Flashcard")
     card_id = input(clr("  Enter card ID to delete: ", CYAN)).strip()
     match = next((c for c in cards if c["id"] == card_id), None)
     if not match:
         print(clr("  Card not found.", RED))
         pause()
         return cards, progress
-
     confirm = input(clr(f"  Delete card: '{match['question'][:50]}'? (y/n): ", YELLOW)).strip().lower()
     if confirm == "y":
         cards = [c for c in cards if c["id"] != card_id]
         progress.pop(card_id, None)
         save_cards(cards)
         save_progress(progress)
-        print(clr("  ✓ Card deleted.", GREEN))
+        print(clr(" Card deleted.", GREEN))
     else:
         print(clr("  Cancelled.", DIM))
     pause()
     return cards, progress
-
-
 def reset_progress(progress):
-    header("🔄 Reset Progress")
+    header(" Reset Progress")
     confirm = input(clr("  Reset ALL progress? This cannot be undone. (yes/no): ", RED)).strip().lower()
     if confirm == "yes":
         progress = {}
         save_progress(progress)
-        print(clr("  ✓ Progress reset.", GREEN))
+        print(clr("  Progress reset.", GREEN))
     else:
         print(clr("  Cancelled.", DIM))
     pause()
     return progress
-
-
-# ─────────────────────────────────────────────
 #  HELP
-# ─────────────────────────────────────────────
 def show_help():
-    header("❓ Help")
+    header(" Help")
     rows = [
         ("1. Start Quiz",       "Begin an adaptive quiz session"),
         ("2. View Stats",       "See your learning progress & accuracy"),
@@ -538,18 +447,13 @@ def show_help():
     print("  This uses the SM-2 spaced repetition algorithm.")
     print()
     pause()
-
-
-# ─────────────────────────────────────────────
 #  MAIN MENU
-# ─────────────────────────────────────────────
 def main_menu(cards, progress):
     due_count = sum(1 for cid, p in progress.items() if is_due(p))
     new_count = sum(1 for c in cards if c["id"] not in progress)
-
     print()
     divider("═")
-    print(clr("  🧠  AI Study Flashcard Quiz", BOLD + CYAN))
+    print(clr("   AI Study Flashcard Quiz", BOLD + CYAN))
     print(clr("       Adaptive Spaced Repetition", DIM))
     divider("═")
     print(f"  Cards due:  {clr(str(due_count), RED + BOLD)}   New: {clr(str(new_count), YELLOW + BOLD)}   Total: {clr(str(len(cards)), BOLD)}")
@@ -568,32 +472,24 @@ def main_menu(cards, progress):
         print(f"  {clr(num, BOLD + CYAN)}.  {label}")
     divider()
     return input(clr("  Enter choice: ", CYAN)).strip()
-
-
-# ─────────────────────────────────────────────
 #  ENTRY POINT
-# ─────────────────────────────────────────────
 def main():
     os.system("clear" if os.name == "posix" else "cls")
 
     print(clr("""
   ╔══════════════════════════════════════════════╗
-  ║   🧠  AI Study Flashcard Quiz               ║
-  ║       Adaptive Learning with Spaced Reps    ║
+  ║        AI Study Flashcard Quiz               ║
+  ║        Adaptive Learning with Spaced Reps    ║
   ╚══════════════════════════════════════════════╝
     """, CYAN + BOLD))
     print(clr("  Loading flashcards...", DIM))
     time.sleep(0.6)
-
     cards = load_cards()
     if not os.path.exists(CARDS_FILE):
         save_cards(cards)
-
     progress = load_progress()
-
     while True:
         choice = main_menu(cards, progress)
-
         if choice == "1":
             progress = run_quiz(cards, progress)
         elif choice == "2":
@@ -609,10 +505,10 @@ def main():
         elif choice == "7":
             show_help()
         elif choice == "8":
-            print(clr("\n  👋 Goodbye! Keep studying!\n", CYAN + BOLD))
+            print(clr("\n   Goodbye! Keep studying!\n", CYAN + BOLD))
             break
         else:
-            print(clr("  ⚠  Invalid choice. Enter 1–8.", RED))
+            print(clr("   Invalid choice. Enter 1–8.", RED))
             time.sleep(0.8)
 
 
