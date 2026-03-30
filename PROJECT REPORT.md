@@ -2,8 +2,8 @@
 ## Project Report
 
 **Submitted by**
-- Student Name: ___________________
-- Reg No: ___________________
+- Student Name: VIVEK YADAV
+- Reg No: 25BCE10796
 
 **Course:** Fundamentals of AI and ML — CSA2001
 
@@ -70,24 +70,24 @@ Students preparing for examinations on topics like AI and ML face difficulty ret
 ## 7. PROS AND CONS OF EXISTING METHODS
 
 ### Anki
-- ✅ Highly effective, proven algorithm
-- ❌ Requires installation, has a GUI, steep learning curve for custom decks
+-  Highly effective, proven algorithm
+- Requires installation, has a GUI, steep learning curve for custom decks
 
 ### Duolingo
-- ✅ Gamified and engaging
-- ❌ Limited to language learning, not subject-customizable
+-  Gamified and engaging
+-  Limited to language learning, not subject-customizable
 
 ### Quizlet
-- ✅ Easy to use, large community deck library
-- ❌ No true spaced repetition in free tier, requires internet
+-  Easy to use, large community deck library
+-  No true spaced repetition in free tier, requires internet
 
 ### Manual Revision
-- ✅ Flexible
-- ❌ No intelligence, highly inefficient, no progress tracking
+-  Flexible
+-  No intelligence, highly inefficient, no progress tracking
 
 ### This Project (AI Flashcard Quiz CLI)
-- ✅ Lightweight, no external dependencies, runs in terminal, customizable, applies real AI algorithm
-- ❌ No audio/visual media, terminal-only interface
+-  Lightweight, no external dependencies, runs in terminal, customizable, applies real AI algorithm
+-  No audio/visual media, terminal-only interface
 
 ---
 
@@ -279,13 +279,13 @@ The full source code is available in `main.py` in the GitHub repository. Key imp
 
 | Test Case | Expected Result | Status |
 |-----------|----------------|--------|
-| Rate card 5 (easy) | Long interval assigned | ✅ Pass |
-| Rate card 0 (fail) | Interval reset to 1 day | ✅ Pass |
-| Use hint | Rating reduced by 1 | ✅ Pass |
-| Add card with empty question | Error message shown | ✅ Pass |
-| Delete non-existent card | "Card not found" message | ✅ Pass |
-| Reset progress | All progress.json data cleared | ✅ Pass |
-| Run with no prior data | Default cards loaded, progress empty | ✅ Pass |
+| Rate card 5 (easy) | Long interval assigned |  Pass |
+| Rate card 0 (fail) | Interval reset to 1 day |  Pass |
+| Use hint | Rating reduced by 1 |  Pass |
+| Add card with empty question | Error message shown |  Pass |
+| Delete non-existent card | "Card not found" message | Pass |
+| Reset progress | All progress.json data cleared |  Pass |
+| Run with no prior data | Default cards loaded, progress empty |  Pass |
 
 ---
 
